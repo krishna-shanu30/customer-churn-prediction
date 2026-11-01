@@ -26,7 +26,7 @@ model, scaler, features = load_artifacts()
 # In[3]:
 
 
-st.title("Customer Churn Predictor")
+st.title("ChurnIQ | Customer Retention Intelligence")
 
 st.header("Input Customer Details")
 credit_score = st.number_input("Credit Score", 300, 850, 650)
