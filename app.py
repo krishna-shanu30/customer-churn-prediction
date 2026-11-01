@@ -69,6 +69,24 @@ def hero(title,subtitle):
 def risk(p):
     return "High" if p>=.70 else "Medium" if p>=.30 else "Low"
 
+def validate_batch_input(frame, training_data, numeric, categorical):
+    """Reject incomplete schemas and unseen categories before scoring a batch."""
+    required=set(numeric+categorical)
+    missing=sorted(required-set(frame.columns))
+    if missing:
+        raise ValueError("Missing required columns: "+", ".join(missing))
+    for column in numeric:
+        converted=pd.to_numeric(frame[column],errors="coerce")
+        invalid=frame[column].notna() & converted.isna()
+        if invalid.any():
+            raise ValueError(f"Column '{column}' contains non-numeric values.")
+    for column in categorical:
+        allowed=set(training_data[column].dropna().astype(str).unique())
+        supplied=set(frame[column].dropna().astype(str).unique())
+        unknown=sorted(supplied-allowed)
+        if unknown:
+            raise ValueError(f"Unsupported value(s) in '{column}': "+", ".join(unknown))
+
 def probability_gauge(p):
     fig=go.Figure(go.Indicator(mode="gauge+number",value=p*100,number={"suffix":"%"},
       gauge={"axis":{"range":[0,100]},"bar":{"color":"#3157A4"},
@@ -149,11 +167,9 @@ def main():
         if uploaded:
             try:
                 raw=pd.read_csv(uploaded)
-                required=set(numeric+categorical)
-                missing=sorted(required-set(raw.columns))
-                if missing: st.error("Missing columns: "+", ".join(missing)); st.stop()
                 if raw.empty: st.warning("The file contains no customer rows."); st.stop()
                 if len(raw)>100000: st.error("Please upload no more than 100,000 records at once."); st.stop()
+                validate_batch_input(raw,data,numeric,categorical)
                 probs=model.predict_proba(raw)[:,1]
                 result=raw.copy(); result["Churn_Probability"]=(probs*100).round(2)
                 result["Predicted_Churn"]=np.where(probs>=.5,"Yes","No")
