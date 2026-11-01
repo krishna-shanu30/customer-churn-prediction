@@ -15,26 +15,26 @@ ChurnIQ is a customer churn analytics and prediction application built with Pyth
 - **About Model:** inputs, risk thresholds and responsible-use notes.
 
 ## Model methodology
-The application explicitly uses \`Exited\` as the prediction target and removes row number, customer ID and surname from model inputs. It uses a preprocessing pipeline with numeric imputation, one-hot encoding and a class-balanced Random Forest classifier.
+The application explicitly uses `Exited` as the prediction target and removes row number, customer ID and surname from model inputs. It uses a preprocessing pipeline with numeric imputation, one-hot encoding and a class-balanced Random Forest classifier.
 
 Evaluation uses a stratified 80/20 train-test split with a fixed random seed. The app trains and caches its model at startup so displayed metrics correspond to the model currently in use.
 
-**Model audit note:** the original training script selected the final dataframe column as its target after one-hot encoding. This could select \`Gender_Male\` rather than \`Exited\`. The ChurnIQ app avoids this issue by selecting \`Exited\` explicitly. Legacy Keras model files are retained for traceability but are not used by the new app.
+**Model audit note:** the original training script selected the final dataframe column as its target after one-hot encoding. This could select `Gender_Male` rather than `Exited`. The ChurnIQ app avoids this issue by selecting `Exited` explicitly. Legacy Keras model files are retained for traceability but are not used by the new app.
 
 ## Run locally
 1. Clone the repository and create a virtual environment.
-2. Install dependencies: \`pip install -r requirements.txt\`
-3. Start the app: \`streamlit run app.py\`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Start the app: `streamlit run app.py`
 
-The app reads \`Churn_Modelling.csv\` from the repository directory.
+The app reads `Churn_Modelling.csv` from the repository directory.
 
 ## Train and save a reusable model
-Run \`python train_model.py\` to create \`churniq_model.joblib\` and \`churniq_metrics.joblib\`. The Streamlit app currently trains and caches its own in-memory pipeline to keep the displayed evaluation metrics aligned with its holdout split.
+Run `python train_model.py` to create `churniq_model.joblib` and `churniq_metrics.joblib`. The Streamlit app currently trains and caches its own in-memory pipeline to keep the displayed evaluation metrics aligned with its holdout split.
 
 ## Batch CSV input
 Use the sample CSV downloaded from the Batch Prediction page. Required columns are:
 
-\`CreditScore, Geography, Gender, Age, Tenure, Balance, NumOfProducts, HasCrCard, IsActiveMember, EstimatedSalary\`
+`CreditScore, Geography, Gender, Age, Tenure, Balance, NumOfProducts, HasCrCard, IsActiveMember, EstimatedSalary`
 
 Use original category values for Geography and Gender.
 
